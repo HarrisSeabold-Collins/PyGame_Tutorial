@@ -8,16 +8,14 @@ screen = pygame.display.set_mode((800,400))
 clock = pygame.time.Clock()
 test_font = pygame.font.Font('font/Pixeltype.ttf', 50)
 game_active = 0
-score = 0
+start_time = 0
 
 # Score Function
 def display_score():
-    current_time = pygame.time.get_ticks()
-    score_surf = test_font.render('SCORE',False,(64,64,64))
-    score_rect = score_surf.get_rect(center = (400,50))
-    screen.blit(score_surf, score_rect)
-
-    print(pygame.font.get_init)
+    current_time = pygame.time.get_ticks() - start_time
+    score_surface = test_font.render(f'{current_time // 100}', False, (64,64,64))
+    score_rect = score_surface.get_rect(center = (400,50))
+    screen.blit(score_surface,score_rect)
 
 # Background Surfaces
 sky_surface = pygame.image.load('graphics/Sky.png').convert()
@@ -34,6 +32,14 @@ fly_rect = fly_surface.get_rect(midbottom = (800,150))
 # Player Rect
 player_surface = pygame.image.load('graphics/Player/player_walk_1.png').convert_alpha()
 player_rect = player_surface.get_rect(midbottom = (80,300))
+
+# Title Screen Player
+player_stand = pygame.image.load('graphics/Player/player_stand.png').convert_alpha()
+player_stand = pygame.transform.rotozoom(player_stand,0,2)
+player_stand_rect = player_stand.get_rect(center = (400,200))
+
+
+
 player_grav = 0
 
 # Full game logic
@@ -46,10 +52,12 @@ while True:
             pygame.quit()
             exit()
         
+        # Keyboard input to restart game
         if game_active == 0 and event.type == pygame.KEYDOWN and event.key == pygame.K_SPACE:
             game_active = 1
             snail_rect.left = 800
             fly_rect.left = 1000
+            start_time = pygame.time.get_ticks()
 
         if game_active == 1:
             # Mouse Jumping
@@ -67,14 +75,18 @@ while True:
     # Game Active
     if game_active == 1:
         
-        display_score()
-
         # Background and Score --------------------------------
         screen.blit(sky_surface,(0,0))
         screen.blit(ground_surface,(0,300))
         # pygame.draw.rect(screen, '#c0e8ec', score_rect)
         # pygame.draw.rect(screen, '#c0e8ec', score_rect, 10, 5)
         # screen.blit(score_surface, score_rect)
+
+        # score_surface = test_font.render('SCORE', False, (64,64,64))
+        # score_rect = score_surface.get_rect(center = (400,50))
+        # screen.blit(score_surface,score_rect)
+
+        display_score()
 
         # Player Code -----------------------------------------
         screen.blit(player_surface, player_rect)
@@ -107,9 +119,19 @@ while True:
         if player_rect.colliderect(fly_rect) == 1:
             print('Fly/Player Collision')
     
-    # Start / Game Over Screen
+    # Start/GameOver Screen
     else:
-        screen.fill('yellow')
+        screen.fill((94,129,162))
+
+        title_surf = test_font.render('Jump Game',False, (64,64,64))
+        title_rect = title_surf.get_rect(center = (400,50))
+        screen.blit(title_surf,title_rect)
+
+        screen.blit(player_stand,player_stand_rect)
+
+        instruct_surf = test_font.render('Press Space to Start', False, (64,64,64))
+        instruct_rect = instruct_surf.get_rect(center = (400,350))
+        screen.blit(instruct_surf, instruct_rect)
 
     pygame.display.update()
     clock.tick(60)
